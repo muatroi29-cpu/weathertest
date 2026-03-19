@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, type ReactNode } from "react"
+import { createContext, useContext, useState, type ReactNode } from "react"
 import useSWR from "swr"
 import type { WeatherData } from "@/app/api/weather/route"
 
@@ -8,6 +8,8 @@ type WeatherContextType = {
   data: WeatherData | undefined
   isLoading: boolean
   error: Error | undefined
+  city: string
+  setCity: (city: string) => void
 }
 
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined)
@@ -15,13 +17,19 @@ const WeatherContext = createContext<WeatherContextType | undefined>(undefined)
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export function WeatherProvider({ children }: { children: ReactNode }) {
-  const { data, error, isLoading } = useSWR<WeatherData>("/api/weather", fetcher, {
-    refreshInterval: 300000, // Refresh every 5 minutes
-    revalidateOnFocus: false,
-  })
+  const [city, setCity] = useState("ha-noi")
+  
+  const { data, error, isLoading } = useSWR<WeatherData>(
+    `/api/weather?city=${city}`,
+    fetcher,
+    {
+      refreshInterval: 300000, // Refresh every 5 minutes
+      revalidateOnFocus: false,
+    }
+  )
 
   return (
-    <WeatherContext.Provider value={{ data, isLoading, error }}>
+    <WeatherContext.Provider value={{ data, isLoading, error, city, setCity }}>
       {children}
     </WeatherContext.Provider>
   )

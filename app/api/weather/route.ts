@@ -1,10 +1,26 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
-// Hanoi coordinates
-const HANOI_LAT = 21.0285
-const HANOI_LON = 105.8542
+// Vietnamese cities coordinates
+export const VIETNAM_CITIES = {
+  "ha-noi": { name: "Ha Noi", lat: 21.0285, lon: 105.8542 },
+  "ho-chi-minh": { name: "TP. Ho Chi Minh", lat: 10.8231, lon: 106.6297 },
+  "da-nang": { name: "Da Nang", lat: 16.0544, lon: 108.2022 },
+  "hai-phong": { name: "Hai Phong", lat: 20.8449, lon: 106.6881 },
+  "can-tho": { name: "Can Tho", lat: 10.0452, lon: 105.7469 },
+  "nha-trang": { name: "Nha Trang", lat: 12.2388, lon: 109.1967 },
+  "hue": { name: "Hue", lat: 16.4637, lon: 107.5909 },
+  "da-lat": { name: "Da Lat", lat: 11.9465, lon: 108.4419 },
+  "vung-tau": { name: "Vung Tau", lat: 10.3460, lon: 107.0843 },
+  "quy-nhon": { name: "Quy Nhon", lat: 13.7829, lon: 109.2196 },
+} as const
+
+export type CityKey = keyof typeof VIETNAM_CITIES
 
 export type WeatherData = {
+  city: {
+    key: string
+    name: string
+  }
   current: {
     temperature: number
     feelsLike: number
@@ -52,51 +68,45 @@ function getConditionFromCode(code: number): string {
 
 function getDescriptionFromCode(code: number): string {
   const descriptions: Record<number, string> = {
-    0: "Trời quang",
-    1: "Chủ yếu quang",
-    2: "Có mây rải rác",
-    3: "Nhiều mây",
-    45: "Sương mù",
-    48: "Sương mù đóng băng",
-    51: "Mưa phùn nhẹ",
-    53: "Mưa phùn vừa",
-    55: "Mưa phùn dày đặc",
-    56: "Mưa phùn đóng băng nhẹ",
-    57: "Mưa phùn đóng băng dày",
-    61: "Mưa nhẹ",
-    63: "Mưa vừa",
-    65: "Mưa to",
-    66: "Mưa đóng băng nhẹ",
-    67: "Mưa đóng băng to",
-    71: "Tuyết rơi nhẹ",
-    73: "Tuyết rơi vừa",
-    75: "Tuyết rơi dày",
-    77: "Hạt tuyết",
-    80: "Mưa rào nhẹ",
-    81: "Mưa rào vừa",
-    82: "Mưa rào to",
-    85: "Tuyết rào nhẹ",
-    86: "Tuyết rào to",
-    95: "Dông",
-    96: "Dông kèm mưa đá nhẹ",
-    99: "Dông kèm mưa đá to",
+    0: "Troi quang",
+    1: "Chu yeu quang",
+    2: "Co may rai rac",
+    3: "Nhieu may",
+    45: "Suong mu",
+    48: "Suong mu dong bang",
+    51: "Mua phun nhe",
+    53: "Mua phun vua",
+    55: "Mua phun day dac",
+    56: "Mua phun dong bang nhe",
+    57: "Mua phun dong bang day",
+    61: "Mua nhe",
+    63: "Mua vua",
+    65: "Mua to",
+    66: "Mua dong bang nhe",
+    67: "Mua dong bang to",
+    71: "Tuyet roi nhe",
+    73: "Tuyet roi vua",
+    75: "Tuyet roi day",
+    77: "Hat tuyet",
+    80: "Mua rao nhe",
+    81: "Mua rao vua",
+    82: "Mua rao to",
+    85: "Tuyet rao nhe",
+    86: "Tuyet rao to",
+    95: "Dong",
+    96: "Dong kem mua da nhe",
+    99: "Dong kem mua da to",
   }
-  return descriptions[code] || "Không xác định"
-}
-
-function getWindDirection(degrees: number): string {
-  const directions = ["Bắc", "Đông Bắc", "Đông", "Đông Nam", "Nam", "Tây Nam", "Tây", "Tây Bắc"]
-  const index = Math.round(degrees / 45) % 8
-  return directions[index]
+  return descriptions[code] || "Khong xac dinh"
 }
 
 function getDayName(dateStr: string, index: number): { day: string; dayName: string } {
   const date = new Date(dateStr)
   const dayNames = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
-  const fullDayNames = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"]
+  const fullDayNames = ["Chu Nhat", "Thu Hai", "Thu Ba", "Thu Tu", "Thu Nam", "Thu Sau", "Thu Bay"]
   
-  if (index === 0) return { day: "Hôm nay", dayName: "Hôm nay" }
-  if (index === 1) return { day: "Ngày mai", dayName: "Ngày mai" }
+  if (index === 0) return { day: "Hom nay", dayName: "Hom nay" }
+  if (index === 1) return { day: "Ngay mai", dayName: "Ngay mai" }
   
   return { 
     day: dayNames[date.getDay()], 
@@ -105,20 +115,25 @@ function getDayName(dateStr: string, index: number): { day: string; dayName: str
 }
 
 function getAqiLevel(aqi: number): string {
-  if (aqi <= 50) return "Tốt"
-  if (aqi <= 100) return "Trung bình"
-  if (aqi <= 150) return "Không tốt cho nhóm nhạy cảm"
-  if (aqi <= 200) return "Không lành mạnh"
-  if (aqi <= 300) return "Rất không lành mạnh"
-  return "Nguy hiểm"
+  if (aqi <= 50) return "Tot"
+  if (aqi <= 100) return "Trung binh"
+  if (aqi <= 150) return "Khong tot cho nhom nhay cam"
+  if (aqi <= 200) return "Khong lanh manh"
+  if (aqi <= 300) return "Rat khong lanh manh"
+  return "Nguy hiem"
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const searchParams = request.nextUrl.searchParams
+    const cityKey = (searchParams.get("city") || "ha-noi") as CityKey
+    
+    const city = VIETNAM_CITIES[cityKey] || VIETNAM_CITIES["ha-noi"]
+    
     // Fetch weather data from Open-Meteo
     const weatherUrl = new URL("https://api.open-meteo.com/v1/forecast")
-    weatherUrl.searchParams.set("latitude", HANOI_LAT.toString())
-    weatherUrl.searchParams.set("longitude", HANOI_LON.toString())
+    weatherUrl.searchParams.set("latitude", city.lat.toString())
+    weatherUrl.searchParams.set("longitude", city.lon.toString())
     weatherUrl.searchParams.set("timezone", "Asia/Ho_Chi_Minh")
     weatherUrl.searchParams.set("current", "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m,wind_direction_10m")
     weatherUrl.searchParams.set("hourly", "temperature_2m,weather_code")
@@ -127,8 +142,8 @@ export async function GET() {
 
     // Fetch air quality data
     const aqiUrl = new URL("https://air-quality-api.open-meteo.com/v1/air-quality")
-    aqiUrl.searchParams.set("latitude", HANOI_LAT.toString())
-    aqiUrl.searchParams.set("longitude", HANOI_LON.toString())
+    aqiUrl.searchParams.set("latitude", city.lat.toString())
+    aqiUrl.searchParams.set("longitude", city.lon.toString())
     aqiUrl.searchParams.set("current", "us_aqi")
     aqiUrl.searchParams.set("timezone", "Asia/Ho_Chi_Minh")
 
@@ -195,6 +210,10 @@ export async function GET() {
     })
 
     const responseData: WeatherData = {
+      city: {
+        key: cityKey,
+        name: city.name,
+      },
       current,
       hourly,
       daily,
