@@ -1,7 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Dices, TrendingUp, Clock, Coins, Trophy, Sparkles, AlertCircle } from "lucide-react"
+
+// Format number consistently to avoid hydration mismatch
+const formatNumber = (num: number): string => {
+  return new Intl.NumberFormat("vi-VN").format(num)
+}
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -89,7 +94,7 @@ export function WeatherBetting() {
           </div>
           <div className="flex items-center gap-2 rounded-full bg-card px-4 py-2 shadow-sm">
             <Coins className="h-4 w-4 text-warning" />
-            <span className="font-bold text-foreground">{balance.toLocaleString()}</span>
+            <span className="font-bold text-foreground">{formatNumber(balance)}</span>
             <span className="text-xs text-muted-foreground">xu</span>
           </div>
         </CardTitle>
@@ -117,7 +122,7 @@ export function WeatherBetting() {
           </div>
           <div className="rounded-xl bg-warning/10 p-3 text-center">
             <p className="text-xs text-muted-foreground">Tiềm năng</p>
-            <p className="text-lg font-bold text-warning">+{totalPotentialWin.toLocaleString()}</p>
+            <p className="text-lg font-bold text-warning">+{formatNumber(totalPotentialWin)}</p>
           </div>
         </div>
 
@@ -203,7 +208,7 @@ export function WeatherBetting() {
                         min={1}
                       />
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>Số dư: {balance.toLocaleString()} xu</span>
+                        <span>Số dư: {formatNumber(balance)} xu</span>
                         <button 
                           onClick={() => setBetAmount(balance.toString())}
                           className="text-primary hover:underline"
@@ -217,7 +222,7 @@ export function WeatherBetting() {
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">Tiềm năng thắng</span>
                           <span className="font-bold text-success">
-                            +{Math.floor(parseInt(betAmount) * option.odds).toLocaleString()} xu
+                            +{formatNumber(Math.floor(parseInt(betAmount) * option.odds))} xu
                           </span>
                         </div>
                       </div>
@@ -265,12 +270,12 @@ export function WeatherBetting() {
                       <div>
                         <p className="text-sm font-medium text-foreground">{option.description}</p>
                         <p className="text-xs text-muted-foreground">
-                          Đặt: {bet.amount.toLocaleString()} xu
+                          Đặt: {formatNumber(bet.amount)} xu
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-bold text-success">
-                          +{bet.potentialWin.toLocaleString()} xu
+                          +{formatNumber(bet.potentialWin)} xu
                         </p>
                         <Badge variant="secondary" className="mt-1">
                           Đang chờ
