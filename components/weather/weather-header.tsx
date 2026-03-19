@@ -53,7 +53,7 @@ export function WeatherHeader() {
       <div className="flex items-center gap-3">
         <Sun className="h-4 w-4 text-muted-foreground" />
         <Switch
-          checked={theme === "dark"}
+          checked={theme === "dark" || false}
           onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
           aria-label="Toggle dark mode"
         />

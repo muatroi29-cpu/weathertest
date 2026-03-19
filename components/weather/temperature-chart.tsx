@@ -1,8 +1,6 @@
 "use client"
 
 import {
-  Line,
-  LineChart,
   XAxis,
   YAxis,
   ResponsiveContainer,
@@ -11,10 +9,34 @@ import {
 } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { temperatureChartData } from "@/lib/weather-data"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useWeather } from "@/lib/weather-context"
 import { TrendingUp } from "lucide-react"
 
 export function TemperatureChart() {
+  const { data, isLoading } = useWeather()
+
+  if (isLoading || !data) {
+    return (
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            Nhiệt độ trong ngày
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[200px] w-full" />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const chartData = data.hourly.map((hour) => ({
+    time: hour.time,
+    temp: hour.temp,
+  }))
+
   return (
     <Card className="border-0 shadow-lg">
       <CardHeader>
@@ -35,7 +57,7 @@ export function TemperatureChart() {
         >
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
-              data={temperatureChartData}
+              data={chartData}
               margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
             >
               <defs>

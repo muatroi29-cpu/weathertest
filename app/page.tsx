@@ -6,41 +6,44 @@ import { HealthMetrics } from "@/components/weather/health-metrics"
 import { TemperatureChart } from "@/components/weather/temperature-chart"
 import { WeeklyForecast } from "@/components/weather/weekly-forecast"
 import { WeatherBetting } from "@/components/weather/weather-betting"
+import { WeatherProvider } from "@/lib/weather-context"
 
 export default function WeatherDashboard() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Header */}
-        <WeatherHeader />
+    <WeatherProvider>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+          {/* Header */}
+          <WeatherHeader />
 
-        {/* Main Content Grid */}
-        <div className="mt-6 space-y-6">
-          {/* Current Weather */}
-          <CurrentWeather />
+          {/* Main Content Grid */}
+          <div className="mt-6 space-y-6">
+            {/* Current Weather */}
+            <CurrentWeather />
 
-          {/* Health Metrics */}
-          <HealthMetrics />
+            {/* Health Metrics */}
+            <HealthMetrics />
 
-          {/* Charts and Forecast Grid */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Temperature Chart */}
-            <TemperatureChart />
+            {/* Charts and Forecast Grid */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Temperature Chart */}
+              <TemperatureChart />
 
-            {/* Weekly Forecast */}
-            <WeeklyForecast />
+              {/* Weekly Forecast */}
+              <WeeklyForecast />
+            </div>
+
+            {/* Weather Betting */}
+            <WeatherBetting />
           </div>
 
-          {/* Weather Betting */}
-          <WeatherBetting />
+          {/* Footer */}
+          <footer className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
+            <p>Weather Dashboard - Dữ liệu từ Open-Meteo API</p>
+            <p className="mt-1">Cập nhật tự động mỗi 5 phút</p>
+          </footer>
         </div>
-
-        {/* Footer */}
-        <footer className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
-          <p>Weather Dashboard - Dữ liệu mô phỏng cho mục đích trình diễn</p>
-          <p className="mt-1">Cập nhật lần cuối: {new Date().toLocaleTimeString("vi-VN")}</p>
-        </footer>
       </div>
-    </div>
+    </WeatherProvider>
   )
 }
