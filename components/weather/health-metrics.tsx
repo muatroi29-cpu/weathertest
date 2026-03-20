@@ -27,9 +27,17 @@ function getUvColor(uv: number) {
 }
 
 function getWindDirection(degrees: number): string {
-  const directions = ["Bắc", "Đông Bắc", "Đông", "Đông Nam", "Nam", "Tây Nam", "Tây", "Tây Bắc"]
-  const index = Math.round(degrees / 45) % 8
-  return directions[index]
+  const dirs = [
+    "Bắc",
+    "Đông Bắc",
+    "Đông",
+    "Đông Nam",
+    "Nam",
+    "Tây Nam",
+    "Tây",
+    "Tây Bắc",
+  ]
+  return dirs[Math.round(degrees / 45) % 8]
 }
 
 function getWindLevel(speed: number): string {
@@ -37,6 +45,19 @@ function getWindLevel(speed: number): string {
   if (speed < 20) return "Gió vừa"
   if (speed < 39) return "Gió mạnh"
   return "Gió rất mạnh"
+}
+
+function getUvLabel(uv: number): string {
+  if (uv >= 8) return "Rất cao"
+  if (uv >= 6) return "Cao"
+  if (uv >= 3) return "Trung bình"
+  return "Thấp"
+}
+
+function getHumidityLabel(h: number): string {
+  if (h > 70) return "Ẩm ướt"
+  if (h > 40) return "Dễ chịu"
+  return "Khô"
 }
 
 export function HealthMetrics() {
@@ -65,7 +86,7 @@ export function HealthMetrics() {
 
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      {/* AQI Card */}
+      {/* AQI */}
       <Card className="border-0 shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -77,11 +98,13 @@ export function HealthMetrics() {
           <div className={`text-3xl font-bold ${getAqiColor(aqi.value)}`}>
             {aqi.value}
           </div>
-          <div className={`mt-2 rounded-full px-2 py-1 text-xs ${getAqiBgColor(aqi.value)} ${getAqiColor(aqi.value)}`}>
+          <div
+            className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs ${getAqiBgColor(aqi.value)} ${getAqiColor(aqi.value)}`}
+          >
             {aqi.level}
           </div>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
-            <div 
+            <div
               className="h-full rounded-full bg-gradient-to-r from-success via-warning to-destructive transition-all"
               style={{ width: `${Math.min(aqi.value / 3, 100)}%` }}
             />
@@ -89,7 +112,7 @@ export function HealthMetrics() {
         </CardContent>
       </Card>
 
-      {/* UV Index Card */}
+      {/* UV Index */}
       <Card className="border-0 shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -102,15 +125,17 @@ export function HealthMetrics() {
             {current.uvIndex}
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            {current.uvIndex >= 8 ? "Rất cao" : current.uvIndex >= 6 ? "Cao" : current.uvIndex >= 3 ? "Trung bình" : "Thấp"}
+            {getUvLabel(current.uvIndex)}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            {current.uvIndex >= 6 ? "Nên đeo kính râm & bôi kem chống nắng" : "An toàn khi ra ngoài"}
+            {current.uvIndex >= 6
+              ? "Nên đeo kính râm & bôi kem chống nắng"
+              : "An toàn khi ra ngoài"}
           </p>
         </CardContent>
       </Card>
 
-      {/* Humidity Card */}
+      {/* Humidity */}
       <Card className="border-0 shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -123,10 +148,10 @@ export function HealthMetrics() {
             {current.humidity}%
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            {current.humidity > 70 ? "Ẩm ướt" : current.humidity > 40 ? "Dễ chịu" : "Khô"}
+            {getHumidityLabel(current.humidity)}
           </p>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
-            <div 
+            <div
               className="h-full rounded-full bg-info transition-all"
               style={{ width: `${current.humidity}%` }}
             />
@@ -134,7 +159,7 @@ export function HealthMetrics() {
         </CardContent>
       </Card>
 
-      {/* Wind Card */}
+      {/* Wind */}
       <Card className="border-0 shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -145,18 +170,26 @@ export function HealthMetrics() {
         <CardContent>
           <div className="text-3xl font-bold text-foreground">
             {current.windSpeed}
-            <span className="ml-1 text-lg font-normal text-muted-foreground">km/h</span>
+            <span className="ml-1 text-lg font-normal text-muted-foreground">
+              km/h
+            </span>
           </div>
           <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-            <Navigation 
-              className="h-4 w-4" 
+            <Navigation
+              className="h-4 w-4"
               style={{ transform: `rotate(${current.windDirection}deg)` }}
             />
             <span>Hướng {getWindDirection(current.windDirection)}</span>
           </div>
           <div className="mt-2 flex items-center gap-1">
-            <div className={`h-2 w-2 animate-pulse rounded-full ${current.windSpeed < 20 ? "bg-success" : "bg-warning"}`} />
-            <span className="text-xs text-muted-foreground">{getWindLevel(current.windSpeed)}</span>
+            <div
+              className={`h-2 w-2 animate-pulse rounded-full ${
+                current.windSpeed < 20 ? "bg-success" : "bg-warning"
+              }`}
+            />
+            <span className="text-xs text-muted-foreground">
+              {getWindLevel(current.windSpeed)}
+            </span>
           </div>
         </CardContent>
       </Card>

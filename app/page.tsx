@@ -7,43 +7,33 @@ import { TemperatureChart } from "@/components/weather/temperature-chart"
 import { WeeklyForecast } from "@/components/weather/weekly-forecast"
 import { WeatherBetting } from "@/components/weather/weather-betting"
 import { WeatherProvider } from "@/lib/weather-context"
+import { AuthProvider } from "@/lib/auth-context"
 
 export default function WeatherDashboard() {
   return (
-    <WeatherProvider>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-          {/* Header */}
-          <WeatherHeader />
+    <AuthProvider>
+      <WeatherProvider>
+        <div className="min-h-screen bg-background">
+          <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+            <WeatherHeader />
 
-          {/* Main Content Grid */}
-          <div className="mt-6 space-y-6">
-            {/* Current Weather */}
-            <CurrentWeather />
-
-            {/* Health Metrics */}
-            <HealthMetrics />
-
-            {/* Charts and Forecast Grid */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              {/* Temperature Chart */}
-              <TemperatureChart />
-
-              {/* Weekly Forecast */}
-              <WeeklyForecast />
+            <div className="mt-6 space-y-6">
+              <CurrentWeather />
+              <HealthMetrics />
+              <div className="grid gap-6 lg:grid-cols-2">
+                <TemperatureChart />
+                <WeeklyForecast />
+              </div>
+              <WeatherBetting />
             </div>
 
-            {/* Weather Betting */}
-            <WeatherBetting />
+            <footer className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
+              <p>Weather Dashboard · Dữ liệu từ Open-Meteo API</p>
+              <p className="mt-1">Cập nhật tự động mỗi 5 phút</p>
+            </footer>
           </div>
-
-          {/* Footer */}
-          <footer className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
-            <p>Weather Dashboard - Dữ liệu từ Open-Meteo API</p>
-            <p className="mt-1">Cập nhật tự động mỗi 5 phút</p>
-          </footer>
         </div>
-      </div>
-    </WeatherProvider>
+      </WeatherProvider>
+    </AuthProvider>
   )
 }
