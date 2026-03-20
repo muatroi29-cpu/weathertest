@@ -1,11 +1,25 @@
 "use client"
 
-import { Sun, CloudSun, Cloud, CloudRain, CloudLightning, Droplets, Calendar } from "lucide-react"
+import {
+  Sun,
+  CloudSun,
+  Cloud,
+  CloudRain,
+  CloudLightning,
+  Droplets,
+  Calendar,
+} from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useWeather } from "@/lib/weather-context"
 
-const WeatherIcon = ({ condition, className }: { condition: string; className?: string }) => {
+const WeatherIcon = ({
+  condition,
+  className,
+}: {
+  condition: string
+  className?: string
+}) => {
   switch (condition) {
     case "sunny":
       return <Sun className={className} />
@@ -54,7 +68,10 @@ export function WeeklyForecast() {
         <CardContent className="p-0">
           <div className="divide-y divide-border">
             {[...Array(7)].map((_, i) => (
-              <div key={i} className="flex items-center justify-between px-6 py-4">
+              <div
+                key={i}
+                className="flex items-center justify-between px-6 py-4"
+              >
                 <Skeleton className="h-5 w-16" />
                 <Skeleton className="h-6 w-20" />
                 <Skeleton className="h-4 w-32" />
@@ -66,10 +83,9 @@ export function WeeklyForecast() {
     )
   }
 
-  // Calculate min/max for the week for proper scaling
-  const weekMin = Math.min(...data.daily.map(d => d.low))
-  const weekMax = Math.max(...data.daily.map(d => d.high))
-  const tempRange = weekMax - weekMin
+  const weekMin = Math.min(...data.daily.map((d) => d.low))
+  const weekMax = Math.max(...data.daily.map((d) => d.high))
+  const tempRange = weekMax - weekMin || 1
 
   return (
     <Card className="border-0 shadow-lg">
@@ -89,15 +105,19 @@ export function WeeklyForecast() {
               }`}
             >
               <div className="flex w-20 items-center">
-                <span className={`font-medium ${index === 0 ? "text-primary" : "text-foreground"}`}>
+                <span
+                  className={`font-medium ${
+                    index === 0 ? "text-primary" : "text-foreground"
+                  }`}
+                >
                   {day.day}
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-2">
-                <WeatherIcon 
-                  condition={day.condition} 
-                  className={`h-6 w-6 ${getConditionColor(day.condition)}`} 
+                <WeatherIcon
+                  condition={day.condition}
+                  className={`h-6 w-6 ${getConditionColor(day.condition)}`}
                 />
                 <div className="flex w-12 items-center gap-1 text-xs text-info">
                   <Droplets className="h-3 w-3" />
@@ -106,7 +126,9 @@ export function WeeklyForecast() {
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="w-8 text-right font-semibold text-foreground">{day.high}°</span>
+                <span className="w-8 text-right font-semibold text-foreground">
+                  {day.high}°
+                </span>
                 <div className="relative h-1.5 w-16 overflow-hidden rounded-full bg-secondary sm:w-24">
                   <div
                     className="absolute h-full rounded-full bg-gradient-to-r from-info via-success to-accent"
